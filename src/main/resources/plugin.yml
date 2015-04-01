@@ -1,0 +1,4 @@
+name: MelodySocket
+main: com.frozendroid.melodysocket.MelodySocket
+version: 0.2
+depend: [TownyChat, Towny]
