@@ -2,22 +2,20 @@ package com.frozendroid.melodysocket.events;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class SocketChatEvent extends Event 
+import com.frozendroid.melodysocket.interfaces.SocketEvent;
+
+public class SocketChatEvent extends Event implements SocketEvent
 {
 	
 	private static final HandlerList handlers = new HandlerList();
 	
+	private String channel;
 	private String uuid;
 	private String message;
-	private String timestamp;
-	
-	public SocketChatEvent(String uuid, String message, String timestamp)
-	{
-		this.uuid = uuid;
-		this.message = message;
-		this.timestamp = timestamp;
-	}
+	private Long timestamp;
 	
 	@Override
 	public HandlerList getHandlers()
@@ -30,6 +28,11 @@ public class SocketChatEvent extends Event
 		return handlers;
 	}
 	
+	public String getChannel()
+	{
+		return channel;
+	}
+	
 	public String getMessage()
 	{
 		return message;
@@ -40,9 +43,22 @@ public class SocketChatEvent extends Event
 		return uuid;
 	}
 
-	public String getTimestamp()
+	public Long getTimestamp()
 	{
 		return timestamp;
+	}
+
+	@Override
+	public void setData(JSONObject data)
+	{
+		try {
+			message = data.getString("message");
+			channel = data.getString("channel");
+			uuid = data.getString("uuid");
+			timestamp = data.getLong("timestamp");
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
 	}
 	
 }

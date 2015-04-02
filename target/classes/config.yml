@@ -3,5 +3,5 @@ Socket:
   port:
   secret:
 Chat:
-  channel:
-  
+  format:
+    general: Test

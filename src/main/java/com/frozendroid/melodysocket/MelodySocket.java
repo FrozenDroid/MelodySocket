@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import com.frozendroid.melodysocket.chat.ChatHandler;
 import com.frozendroid.melodysocket.events.SocketChatEvent;
-import com.frozendroid.melodysocket.events.SocketEventFactory;
 import com.frozendroid.melodysocket.listeners.ChatListener;
 import com.frozendroid.melodysocket.listeners.SocketListener;
 import com.frozendroid.melodysocket.socket.SocketHandler;
@@ -26,10 +25,12 @@ public class MelodySocket extends JavaPlugin{
 	private PluginManager pluginmanager;
 	private static Chat townychat;
 	private Server server;
-	private static Configuration config;
+	public static Configuration config;
 	private static Plugin plugin;
+	private static MelodySocket instance;
 	private static Socket socket;
 	private static SocketHandler sockethandler;
+	@SuppressWarnings("unused")
 	private static ChatHandler chathandler;
 	private boolean isEnabled = true;
 
@@ -38,13 +39,14 @@ public class MelodySocket extends JavaPlugin{
 	
 	public void onEnable()
 	{
+		saveDefaultConfig();
 		plugin = this;
+		instance = this;
 		config = getConfig();
 		server = getServer();
 		pluginmanager = server.getPluginManager();
 		logger = getLogger();
 		
-		saveDefaultConfig();
 		
 		initializeSocket();
 		sockethandler = new SocketHandler(socket);
@@ -56,15 +58,16 @@ public class MelodySocket extends JavaPlugin{
 				logger.info("Hooked into TownyChat!");
 			}
 			
-			chathandler = new ChatHandler(this);
+			chathandler = new ChatHandler();
 			
-			pluginmanager.registerEvents(new ChatListener(this), this);
-			new SocketListener(sockethandler);
+			pluginmanager.registerEvents(new ChatListener(), this);
+			pluginmanager.registerEvents(new SocketListener(), this);
 			
 			socket.connect();
 			
-			SocketChatEvent event = new SocketChatEvent("test", "test", "test");
-			sockethandler.on("test", new SocketEventFactory());
+			SocketChatEvent event = new SocketChatEvent();
+
+			sockethandler.on("message", event);
 			
 			JSONObject json = new JSONObject();
 			try {
@@ -87,9 +90,19 @@ public class MelodySocket extends JavaPlugin{
 		return townychat;
 	}
 	
-	public static Plugin getInstance()
+	public static MelodySocket getInstance()
+	{
+		return instance;
+	}
+	
+	public static Plugin getPlugin()
 	{
 		return plugin;
+	}
+	
+	public static SocketHandler getSocketHandler()
+	{
+		return sockethandler;
 	}
 	
 	public void initializeSocket()

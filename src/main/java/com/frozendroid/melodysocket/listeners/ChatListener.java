@@ -3,19 +3,14 @@ package com.frozendroid.melodysocket.listeners;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import com.frozendroid.melodysocket.MelodySocket;
 import com.palmergames.bukkit.TownyChat.channels.Channel;
 import com.palmergames.bukkit.TownyChat.events.AsyncChatHookEvent;
 
 public class ChatListener implements Listener{
-
-	private Plugin plugin;
-	
-	public ChatListener(Plugin plugin)
-	{
-		this.plugin = plugin;
-	}
 	
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onChat(AsyncChatHookEvent event)
@@ -23,10 +18,17 @@ public class ChatListener implements Listener{
 		Channel channel = event.getChannel();
 		String channelname = channel.getName();
 		
-		plugin.getLogger().info("Somebody said something");
-		
 		if(channelname.equalsIgnoreCase("general")){
-			plugin.getLogger().info("Somebody said something in Global");
+			JSONObject msgdata = new JSONObject();
+			try {
+				msgdata.put("channel", "general");
+				msgdata.put("message", event.getMessage());
+				msgdata.put("uuid", event.getPlayer().getUniqueId().toString());
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			
+			MelodySocket.getSocketHandler().emit("message", msgdata);
 		}
 	
 	}
